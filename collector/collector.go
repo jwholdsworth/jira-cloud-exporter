@@ -14,8 +14,8 @@ import (
 // JiraCollector initiates the collection of metrics from the JIRA instance
 func JiraCollector() *JiraMetrics {
 	return &JiraMetrics{
-		jiraIssues: prometheus.NewDesc(prometheus.BuildFQName("jira", "issue", "status"),
-			"Shows the number of issues in the workspace",
+		jiraIssues: prometheus.NewDesc(prometheus.BuildFQName("jira", "cloud", "exporter"),
+			"Shows the number of issues matching the JQL",
 			[]string{"status", "project", "id", "assignee"}, nil,
 		),
 	}
