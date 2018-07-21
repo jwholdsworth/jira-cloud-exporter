@@ -11,36 +11,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-//Define a struct for you collector that contains pointers
-//to prometheus descriptors for each metric you wish to expose.
-//Note you can also include fields of other types if they provide utility
-//but we just won't be exposing them as metrics.
-type JiraMetrics struct {
-	jiraIssues *prometheus.Desc
-}
-
-type JiraIssue struct {
-	Fields Fields `json:"fields"`
-	ID     string `json:"key"`
-}
-
-type Fields struct {
-	Project Project `json:"project"`
-	Status  Status  `json:"status"`
-}
-
-type Status struct {
-	Name string `json:"name"`
-}
-
-type Project struct {
-	Name string `json:"name"`
-}
-
-type JiraIssues struct {
-	Issues []JiraIssue `json:"issues"`
-}
-
 //You must create a constructor for you collector that
 //initializes every descriptor and returns a pointer to the collector
 func JiraCollector() *JiraMetrics {
