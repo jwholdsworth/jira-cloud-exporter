@@ -11,22 +11,18 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-//You must create a constructor for you collector that
-//initializes every descriptor and returns a pointer to the collector
+// JiraCollector initiates the collection of metrics from the JIRA instance
 func JiraCollector() *JiraMetrics {
 	return &JiraMetrics{
 		jiraIssues: prometheus.NewDesc(prometheus.BuildFQName("jira", "issue", "status"),
 			"Shows the number of issues in the workspace",
-			[]string{"status", "project", "id"}, nil,
+			[]string{"status", "project", "id", "assignee"}, nil,
 		),
 	}
 }
 
-//Each and every collector must implement the Describe function.
-//It essentially writes all descriptors to the prometheus desc channel.
+// Describe writes all descriptors to the prometheus desc channel.
 func (collector *JiraMetrics) Describe(ch chan<- *prometheus.Desc) {
-
-	//Update this section with the each metric you create for a given collector
 	ch <- collector.jiraIssues
 }
 
@@ -35,10 +31,8 @@ func (collector *JiraMetrics) Collect(ch chan<- prometheus.Metric) {
 
 	collectedIssues := fetchJiraIssues()
 
-	//Write latest value for each metric in the prometheus metric channel.
-	//Note that you can pass CounterValue, GaugeValue, or UntypedValue types here.
 	for _, issue := range collectedIssues.Issues {
-		ch <- prometheus.MustNewConstMetric(collector.jiraIssues, prometheus.GaugeValue, 1, issue.Fields.Status.Name, issue.Fields.Project.Name, issue.ID)
+		ch <- prometheus.MustNewConstMetric(collector.jiraIssues, prometheus.GaugeValue, 1, issue.Fields.Status.Name, issue.Fields.Project.Name, issue.ID, issue.Fields.Assignee.Name)
 	}
 }
 

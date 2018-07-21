@@ -12,8 +12,13 @@ type JiraIssue struct {
 }
 
 type Fields struct {
-	Project Project `json:"project"`
-	Status  Status  `json:"status"`
+	Assignee Assignee `json:"assignee"`
+	Project  Project  `json:"project"`
+	Status   Status   `json:"status"`
+}
+
+type Assignee struct {
+	Name string `json:"name"`
 }
 
 type Status struct {
