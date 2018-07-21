@@ -9,6 +9,7 @@ Configuration is provided in the form of environment variables.
 ### Required
 
 * `JIRA_TOKEN` should be self-explanatory. Create one under your user account settings in JIRA Cloud.
+* `JIRA_USERNAME` is the username associated with the token.
 * `JIRA_URL` is the URL to your organisation's JIRA application.
 
 ### Optional

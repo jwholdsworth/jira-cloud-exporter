@@ -4,6 +4,7 @@ import "os"
 
 type Config struct {
 	JiraToken     string
+	JiraUsername  string
 	JiraJql       string
 	JiraURL       string
 	MetricsPath   string
@@ -14,6 +15,7 @@ type Config struct {
 func Init() Config {
 
 	jiraToken := getEnv("JIRA_TOKEN", "")
+	jiraUsername := getEnv("JIRA_USERNAME", "")
 	jiraJql := getEnv("JIRA_JQL", "")
 	jiraURL := getEnv("JIRA_URL", "https://infinityworks.atlassian.net")
 	metricsPath := getEnv("METRICS_PATH", "/metrics")
@@ -21,6 +23,7 @@ func Init() Config {
 
 	appConfig := Config{
 		jiraToken,
+		jiraUsername,
 		jiraJql,
 		jiraURL,
 		metricsPath,
