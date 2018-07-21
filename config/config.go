@@ -17,7 +17,7 @@ func Init() Config {
 	jiraToken := getEnv("JIRA_TOKEN", "")
 	jiraUsername := getEnv("JIRA_USERNAME", "")
 	jiraJql := getEnv("JIRA_JQL", "")
-	jiraURL := getEnv("JIRA_URL", "https://infinityworks.atlassian.net")
+	jiraURL := getEnv("JIRA_URL", "")
 	metricsPath := getEnv("METRICS_PATH", "/metrics")
 	listenAddress := getEnv("LISTEN_ADDRESS", ":9800")
 

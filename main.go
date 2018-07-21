@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/infinityworks/jira-cloud-exporter/collector"
-	"github.com/infinityworks/jira-cloud-exporter/config"
+	"github.com/jwholdsworth/jira-cloud-exporter/collector"
+	"github.com/jwholdsworth/jira-cloud-exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"

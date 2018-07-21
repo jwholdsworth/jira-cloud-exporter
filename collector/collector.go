@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/infinityworks/jira-cloud-exporter/config"
+	"github.com/jwholdsworth/jira-cloud-exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
