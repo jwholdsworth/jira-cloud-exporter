@@ -8,7 +8,7 @@ type JiraMetrics struct {
 
 type JiraIssue struct {
 	Fields Fields `json:"fields"`
-	ID     string `json:"key"`
+	Key    string `json:"key"`
 }
 
 type Fields struct {

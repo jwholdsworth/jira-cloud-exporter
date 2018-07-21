@@ -16,3 +16,7 @@ Configuration is provided in the form of environment variables.
 * `JIRA_JQL` is the JIRA query language search filter (defaults to empty, so you'll get everything)
 * `METRICS_PATH` is the endpoint Prometheus should scrape on this exporter. Defaults to `/metrics`
 * `LISTEN_ADDRESS` is the IP and port to bind this exporter to. Defaults to `:9800`.
+
+## Metrics
+
+See the example metrics in `METRICS.md`.
