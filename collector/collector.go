@@ -20,9 +20,21 @@ type JiraMetrics struct {
 }
 
 type JiraIssue struct {
-	Workspace string `json:"workspace"`
-	Status    string `json:"status"`
-	ID        string `json:"key"`
+	Fields Fields `json:"fields"`
+	ID     string `json:"key"`
+}
+
+type Fields struct {
+	Project Project `json:"project"`
+	Status  Status  `json:"status"`
+}
+
+type Status struct {
+	Name string `json:"name"`
+}
+
+type Project struct {
+	Name string `json:"name"`
 }
 
 type JiraIssues struct {
@@ -35,7 +47,7 @@ func JiraCollector() *JiraMetrics {
 	return &JiraMetrics{
 		jiraIssues: prometheus.NewDesc(prometheus.BuildFQName("jira", "issue", "status"),
 			"Shows the number of issues in the workspace",
-			[]string{"status", "workspace", "id"}, nil,
+			[]string{"status", "project", "id"}, nil,
 		),
 	}
 }
@@ -56,7 +68,7 @@ func (collector *JiraMetrics) Collect(ch chan<- prometheus.Metric) {
 	//Write latest value for each metric in the prometheus metric channel.
 	//Note that you can pass CounterValue, GaugeValue, or UntypedValue types here.
 	for _, issue := range collectedIssues.Issues {
-		ch <- prometheus.MustNewConstMetric(collector.jiraIssues, prometheus.GaugeValue, 1, issue.Status, issue.Workspace, issue.ID)
+		ch <- prometheus.MustNewConstMetric(collector.jiraIssues, prometheus.GaugeValue, 1, issue.Fields.Status.Name, issue.Fields.Project.Name, issue.ID)
 	}
 }
 
