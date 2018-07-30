@@ -18,7 +18,9 @@ func main() {
 	prometheus.MustRegister(jiraCollector)
 
 	http.Handle(cfg.MetricsPath, promhttp.Handler())
-	http.Handle("/", http.RedirectHandler(cfg.MetricsPath, http.StatusMovedPermanently))
+	if cfg.MetricsPath != "/" {
+		http.Handle("/", http.RedirectHandler(cfg.MetricsPath, http.StatusMovedPermanently))
+	}
 	log.Info(fmt.Sprintf("Listening on %s", cfg.ListenAddress))
 	log.Fatal(http.ListenAndServe(cfg.ListenAddress, nil))
 }

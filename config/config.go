@@ -33,7 +33,7 @@ func Init() Config {
 	return appConfig
 }
 
-func getEnv(environmentVariable string, defaultValue string) string {
+func getEnv(environmentVariable, defaultValue string) string {
 	envVar := os.Getenv(environmentVariable)
 	if len(envVar) == 0 {
 		return defaultValue
