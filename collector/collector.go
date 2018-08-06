@@ -45,7 +45,8 @@ func fetchJiraIssues() JiraIssues {
 	url := fmt.Sprintf("%s/rest/api/2/search?jql=%s", cfg.JiraURL, cfg.JiraJql)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
+		return jiraIssues
 	}
 	req.Header.Set("User-Agent", "jira-cloud-exporter")
 	req.SetBasicAuth(cfg.JiraUsername, cfg.JiraToken)
@@ -54,11 +55,13 @@ func fetchJiraIssues() JiraIssues {
 
 	if err != nil {
 		log.Error(err)
+		return jiraIssues
 	}
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
 		log.Error(readErr)
+		return jiraIssues
 	}
 
 	jsonError := json.Unmarshal(body, &jiraIssues)
