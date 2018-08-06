@@ -53,17 +53,17 @@ func fetchJiraIssues() JiraIssues {
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		log.Fatal(readErr)
+		log.Error(readErr)
 	}
 
 	jsonError := json.Unmarshal(body, &jiraIssues)
 	if jsonError != nil {
-		log.Fatal(jsonError)
+		log.Error(jsonError)
 	}
 
 	return jiraIssues
