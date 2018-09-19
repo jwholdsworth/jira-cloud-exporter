@@ -15,6 +15,7 @@ type Fields struct {
 	Assignee Assignee `json:"assignee"`
 	Project  Project  `json:"project"`
 	Status   Status   `json:"status"`
+	Created  string   `json:"created"`
 }
 
 type Assignee struct {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/jwholdsworth/jira-cloud-exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
@@ -32,8 +33,20 @@ func (collector *JiraMetrics) Collect(ch chan<- prometheus.Metric) {
 	collectedIssues := fetchJiraIssues()
 
 	for _, issue := range collectedIssues.Issues {
-		ch <- prometheus.MustNewConstMetric(collector.jiraIssues, prometheus.GaugeValue, 1, issue.Fields.Status.Name, issue.Fields.Project.Name, issue.Key, issue.Fields.Assignee.Name)
+		createdTimestamp := convertToUnixTime(issue.Fields.Created)
+		ch <- prometheus.MustNewConstMetric(collector.jiraIssues, prometheus.CounterValue, createdTimestamp, issue.Fields.Status.Name, issue.Fields.Project.Name, issue.Key, issue.Fields.Assignee.Name)
 	}
+}
+
+func convertToUnixTime(timestamp string) float64 {
+	layout := "2006-01-02T15:04:05.000-0700"
+	dateTime, err := time.Parse(layout, timestamp)
+	if err != nil {
+		log.Error(err)
+		return 0
+	}
+
+	return float64(dateTime.Unix())
 }
 
 func fetchJiraIssues() JiraIssues {
