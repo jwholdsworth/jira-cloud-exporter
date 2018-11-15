@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/prometheus/common/log"
-	log "github.com/sirupsen/logrus"
 )
 
 type Config struct {
@@ -32,11 +31,8 @@ func Init() []Config {
 	// fmt.Println("Usernames:", usernames)
 	// fmt.Println("JQLs:", jqls)
 
-	if len(urls) != len(jqls) {
-		log.Error("The number of Jira URLs doesn't match the number of JQLs")
-		os.Exit(1)
-	} else if len(jqls) != len(usernames) {
-		log.Error("The number of JQLs doesn't match the number of Jira Usernames")
+	if len(urls) != len(usernames) {
+		log.Error("The number of Jira URLs doesn't match the number of Usernames")
 		os.Exit(1)
 	} else if len(usernames) != len(tokens) {
 		log.Error("The number of Jira Usernames doesn't match the number of Jira Tokens")

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"jira-cloud-exporter/config"
@@ -62,6 +64,22 @@ func fetchJiraIssues() JiraIssues {
 		var jiraIssues JiraIssues
 
 		// fmt.Println("Config:", cfg)
+
+		// Confirm Jira URL begins with the http:// or https:// scheme specification
+		// Also emit a warning if HTTPS isn't being used
+		if !strings.HasPrefix(cfg.JiraURL, "http") {
+			log.Error("The Jira URL: ", cfg.JiraURL, " does not begin with 'http'")
+			os.Exit(1)
+		} else if !strings.HasPrefix(cfg.JiraURL, "https://") {
+			log.Warn("The Jira URL: ", cfg.JiraURL, " is insecure, your API token is being sent in clear text")
+		}
+
+		if len(cfg.JiraUsername) < 5 {
+			log.Warn("The Jira username has fewer than 5 characters, are you sure it is valid?")
+		}
+		if len(cfg.JiraToken) < 10 {
+			log.Warn("The Jira token has fewer than 10 characters, are you sure it is valid?")
+		}
 
 		client := http.Client{}
 		url := fmt.Sprintf("%s/rest/api/2/search?jql=%s", cfg.JiraURL, cfg.JiraJql)
