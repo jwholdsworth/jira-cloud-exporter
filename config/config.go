@@ -1,33 +1,54 @@
 package config
 
-import "os"
+import (
+	"os"
+	"strings"
+
+	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
+)
 
 type Config struct {
-	JiraToken     string
-	JiraUsername  string
-	JiraJql       string
-	JiraURL       string
-	MetricsPath   string
-	ListenAddress string
+	JiraToken    string
+	JiraUsername string
+	JiraJql      string
+	JiraURL      string
 }
 
 // Init populates the Config struct based on environmental runtime configuration
-func Init() Config {
+func Init() []Config {
 
 	jiraToken := getEnv("JIRA_TOKEN", "")
 	jiraUsername := getEnv("JIRA_USERNAME", "")
 	jiraJql := getEnv("JIRA_JQL", "")
 	jiraURL := getEnv("JIRA_URL", "")
-	metricsPath := getEnv("METRICS_PATH", "/metrics")
-	listenAddress := getEnv("LISTEN_ADDRESS", ":9800")
 
-	appConfig := Config{
-		jiraToken,
-		jiraUsername,
-		jiraJql,
-		jiraURL,
-		metricsPath,
-		listenAddress,
+	tokens := strings.Split(jiraToken, ",")
+	usernames := strings.Split(jiraUsername, ",")
+	jqls := strings.Split(jiraJql, ",")
+	urls := strings.Split(jiraURL, ",")
+	// fmt.Println("URLs:", urls)
+	// fmt.Println("Tokens:", tokens)
+	// fmt.Println("Usernames:", usernames)
+	// fmt.Println("JQLs:", jqls)
+
+	if len(urls) != len(jqls) {
+		log.Error("The number of Jira URLs doesn't match the number of JQLs")
+		os.Exit(1)
+	} else if len(jqls) != len(usernames) {
+		log.Error("The number of JQLs doesn't match the number of Jira Usernames")
+		os.Exit(1)
+	} else if len(usernames) != len(tokens) {
+		log.Error("The number of Jira Usernames doesn't match the number of Jira Tokens")
+		os.Exit(1)
+	}
+
+	var appConfig []Config
+	appConfig = make([]Config, 0)
+
+	for i, items := range urls {
+		temp := Config{tokens[i], usernames[i], jqls[i], items}
+		appConfig = append(appConfig, temp)
 	}
 
 	return appConfig

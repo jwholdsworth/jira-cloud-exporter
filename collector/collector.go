@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jwholdsworth/jira-cloud-exporter/config"
+	"jira-cloud-exporter/config"
+
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 )
@@ -51,36 +52,49 @@ func convertToUnixTime(timestamp string) float64 {
 
 func fetchJiraIssues() JiraIssues {
 	// DI this
-	cfg := config.Init()
-	var jiraIssues JiraIssues
 
-	client := http.Client{}
-	url := fmt.Sprintf("%s/rest/api/2/search?jql=%s", cfg.JiraURL, cfg.JiraJql)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Error(err)
-		return jiraIssues
+	cfgs := config.Init()
+	// fmt.Println("Array:", cfgs)
+
+	var temp JiraIssues
+
+	for _, cfg := range cfgs {
+		var jiraIssues JiraIssues
+
+		// fmt.Println("Config:", cfg)
+
+		client := http.Client{}
+		url := fmt.Sprintf("%s/rest/api/2/search?jql=%s", cfg.JiraURL, cfg.JiraJql)
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			log.Error(err)
+			return jiraIssues
+		}
+		req.Header.Set("User-Agent", "jira-cloud-exporter")
+		req.SetBasicAuth(cfg.JiraUsername, cfg.JiraToken)
+		log.Info(fmt.Sprintf("Sending request to %s", url))
+		res, err := client.Do(req)
+
+		if err != nil {
+			log.Error(err)
+			return jiraIssues
+		}
+
+		body, readErr := ioutil.ReadAll(res.Body)
+		if readErr != nil {
+			log.Error(readErr)
+			return jiraIssues
+		}
+
+		jsonError := json.Unmarshal(body, &jiraIssues)
+		if jsonError != nil {
+			log.Error(jsonError)
+		}
+
+		temp.Issues = append(temp.Issues, jiraIssues.Issues...)
+
 	}
-	req.Header.Set("User-Agent", "jira-cloud-exporter")
-	req.SetBasicAuth(cfg.JiraUsername, cfg.JiraToken)
-	log.Info(fmt.Sprintf("Sending request to %s", url))
-	res, err := client.Do(req)
 
-	if err != nil {
-		log.Error(err)
-		return jiraIssues
-	}
-
-	body, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		log.Error(readErr)
-		return jiraIssues
-	}
-
-	jsonError := json.Unmarshal(body, &jiraIssues)
-	if jsonError != nil {
-		log.Error(jsonError)
-	}
-
-	return jiraIssues
+	// return jiraIssues
+	return temp
 }
