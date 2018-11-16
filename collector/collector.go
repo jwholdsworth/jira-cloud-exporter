@@ -74,8 +74,8 @@ func fetchJiraIssues() JiraIssues {
 			log.Warn("The Jira URL: ", cfg.JiraURL, " is insecure, your API token is being sent in clear text")
 		}
 
-		if len(cfg.JiraUsername) < 5 {
-			log.Warn("The Jira username has fewer than 5 characters, are you sure it is valid?")
+		if len(cfg.JiraUsername) < 6 {
+			log.Warn("The Jira username has fewer than 6 characters, are you sure it is valid?")
 		}
 		if len(cfg.JiraToken) < 10 {
 			log.Warn("The Jira token has fewer than 10 characters, are you sure it is valid?")
