@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -30,7 +29,7 @@ func (collector *JiraMetrics) Describe(ch chan<- *prometheus.Desc) {
 	ch <- collector.jiraIssues
 }
 
-//Collect implements required collect function for all promehteus collectors
+//Collect implements required collect function for all prometheus collectors
 func (collector *JiraMetrics) Collect(ch chan<- prometheus.Metric) {
 
 	collectedIssues := fetchJiraIssues()
@@ -58,7 +57,7 @@ func fetchJiraIssues() JiraIssues {
 	cfgs := config.Init()
 	// fmt.Println("Array:", cfgs)
 
-	var temp JiraIssues
+	var AllIssues JiraIssues
 
 	for _, cfg := range cfgs {
 		var jiraIssues JiraIssues
@@ -69,7 +68,8 @@ func fetchJiraIssues() JiraIssues {
 		// Also emit a warning if HTTPS isn't being used
 		if !strings.HasPrefix(cfg.JiraURL, "http") {
 			log.Error("The Jira URL: ", cfg.JiraURL, " does not begin with 'http'")
-			os.Exit(1)
+			// Return an error to the calling function instead:
+			return jiraIssues
 		} else if !strings.HasPrefix(cfg.JiraURL, "https://") {
 			log.Warn("The Jira URL: ", cfg.JiraURL, " is insecure, your API token is being sent in clear text")
 		}
@@ -109,10 +109,13 @@ func fetchJiraIssues() JiraIssues {
 			log.Error(jsonError)
 		}
 
-		temp.Issues = append(temp.Issues, jiraIssues.Issues...)
+		AllIssues.Issues = append(AllIssues.Issues, jiraIssues.Issues...)
 
 	}
 
-	// return jiraIssues
-	return temp
+	return AllIssues
+}
+
+type error interface {
+	Error() string
 }

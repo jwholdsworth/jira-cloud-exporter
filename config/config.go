@@ -17,6 +17,7 @@ type Config struct {
 // Init populates the Config struct based on environmental runtime configuration
 func Init() []Config {
 
+	// Should read these from a config file (viper module):
 	jiraToken := getEnv("JIRA_TOKEN", "")
 	jiraUsername := getEnv("JIRA_USERNAME", "")
 	jiraJql := getEnv("JIRA_JQL", "")
@@ -26,21 +27,19 @@ func Init() []Config {
 	usernames := strings.Split(jiraUsername, ",")
 	jqls := strings.Split(jiraJql, ",")
 	urls := strings.Split(jiraURL, ",")
-	// fmt.Println("URLs:", urls)
-	// fmt.Println("Tokens:", tokens)
-	// fmt.Println("Usernames:", usernames)
-	// fmt.Println("JQLs:", jqls)
 
 	if len(urls) != len(usernames) {
-		log.Error("The number of Jira URLs doesn't match the number of Usernames")
-		os.Exit(1)
+		log.Fatal("The number of Jira URLs doesn't match the number of Usernames")
+		// Return an error to the calling function instead:
+
 	} else if len(usernames) != len(tokens) {
-		log.Error("The number of Jira Usernames doesn't match the number of Jira Tokens")
-		os.Exit(1)
+		log.Fatal("The number of Jira Usernames doesn't match the number of Jira Tokens")
+		// Return an error to the calling function instead:
 	}
 
-	var appConfig []Config
-	appConfig = make([]Config, 0)
+	// The line below shouldn't be needed
+	//var appConfig []Config
+	appConfig := make([]Config, 0)
 
 	for i, items := range urls {
 		temp := Config{tokens[i], usernames[i], jqls[i], items}

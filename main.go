@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
+	"jira-cloud-exporter/collector"
 	"net/http"
 	"os"
-	"jira-cloud-exporter/collector"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	// Should read these from a config file (viper module):
 	metricsPath := getEnv("METRICS_PATH", "/metrics")
 	listenAddress := getEnv("LISTEN_ADDRESS", ":9800")
 	jiraCollector := collector.JiraCollector()
