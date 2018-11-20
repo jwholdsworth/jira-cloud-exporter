@@ -1,10 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strings"
-
-	"github.com/prometheus/common/log"
 )
 
 type Config struct {
@@ -15,9 +14,8 @@ type Config struct {
 }
 
 // Init populates the Config struct based on environmental runtime configuration
-func Init() []Config {
+func Init() ([]Config, error) {
 
-	// Should read these from a config file (viper module):
 	jiraToken := getEnv("JIRA_TOKEN", "")
 	jiraUsername := getEnv("JIRA_USERNAME", "")
 	jiraJql := getEnv("JIRA_JQL", "")
@@ -28,25 +26,22 @@ func Init() []Config {
 	jqls := strings.Split(jiraJql, ",")
 	urls := strings.Split(jiraURL, ",")
 
-	if len(urls) != len(usernames) {
-		log.Fatal("The number of Jira URLs doesn't match the number of Usernames")
-		// Return an error to the calling function instead:
-
-	} else if len(usernames) != len(tokens) {
-		log.Fatal("The number of Jira Usernames doesn't match the number of Jira Tokens")
-		// Return an error to the calling function instead:
-	}
-
-	// The line below shouldn't be needed
-	//var appConfig []Config
 	appConfig := make([]Config, 0)
+
+	if len(urls) != len(usernames) {
+		err := fmt.Errorf("The number of Jira URLs doesn't match the number of Jira Usernames")
+		return appConfig, err
+	} else if len(usernames) != len(tokens) {
+		err := fmt.Errorf("The number of Jira Usernames doesn't match the number of Jira Tokens")
+		return appConfig, err
+	}
 
 	for i, items := range urls {
 		temp := Config{tokens[i], usernames[i], jqls[i], items}
 		appConfig = append(appConfig, temp)
 	}
 
-	return appConfig
+	return appConfig, nil
 }
 
 func getEnv(environmentVariable, defaultValue string) string {

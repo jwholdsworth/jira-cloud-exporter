@@ -8,13 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"jira-cloud-exporter/config"
-
+	"github.com/jwholdsworth/jira-cloud-exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 )
 
-// JiraCollector initiates the collection of metrics from the JIRA instance
+// JiraCollector initiates the collection of metrics from a JIRA instance
 func JiraCollector() *JiraMetrics {
 	return &JiraMetrics{
 		jiraIssues: prometheus.NewDesc(prometheus.BuildFQName("jira", "cloud", "exporter"),
@@ -32,7 +31,11 @@ func (collector *JiraMetrics) Describe(ch chan<- *prometheus.Desc) {
 //Collect implements required collect function for all prometheus collectors
 func (collector *JiraMetrics) Collect(ch chan<- prometheus.Metric) {
 
-	collectedIssues := fetchJiraIssues()
+	collectedIssues, err := fetchJiraIssues()
+	if err != nil {
+		log.Error(err)
+		return
+	}
 
 	for _, issue := range collectedIssues.Issues {
 		createdTimestamp := convertToUnixTime(issue.Fields.Created)
@@ -51,29 +54,25 @@ func convertToUnixTime(timestamp string) float64 {
 	return float64(dateTime.Unix())
 }
 
-func fetchJiraIssues() JiraIssues {
-	// DI this
+func fetchJiraIssues() (JiraIssues, error) {
 
-	cfgs := config.Init()
-	// fmt.Println("Array:", cfgs)
-
+	cfgs, err := config.Init()
+	if err != nil {
+		log.Error(err)
+	}
 	var AllIssues JiraIssues
 
 	for _, cfg := range cfgs {
 		var jiraIssues JiraIssues
 
-		// fmt.Println("Config:", cfg)
-
-		// Confirm Jira URL begins with the http:// or https:// scheme specification
+		// Confirm the Jira URL begins with the http:// or https:// scheme specification
 		// Also emit a warning if HTTPS isn't being used
 		if !strings.HasPrefix(cfg.JiraURL, "http") {
-			log.Error("The Jira URL: ", cfg.JiraURL, " does not begin with 'http'")
-			// Return an error to the calling function instead:
-			return jiraIssues
+			err := fmt.Errorf("The Jira URL: %s does not begin with 'http'", cfg.JiraURL)
+			return jiraIssues, err
 		} else if !strings.HasPrefix(cfg.JiraURL, "https://") {
 			log.Warn("The Jira URL: ", cfg.JiraURL, " is insecure, your API token is being sent in clear text")
 		}
-
 		if len(cfg.JiraUsername) < 6 {
 			log.Warn("The Jira username has fewer than 6 characters, are you sure it is valid?")
 		}
@@ -85,8 +84,7 @@ func fetchJiraIssues() JiraIssues {
 		url := fmt.Sprintf("%s/rest/api/2/search?jql=%s", cfg.JiraURL, cfg.JiraJql)
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {
-			log.Error(err)
-			return jiraIssues
+			return jiraIssues, err
 		}
 		req.Header.Set("User-Agent", "jira-cloud-exporter")
 		req.SetBasicAuth(cfg.JiraUsername, cfg.JiraToken)
@@ -94,26 +92,24 @@ func fetchJiraIssues() JiraIssues {
 		res, err := client.Do(req)
 
 		if err != nil {
-			log.Error(err)
-			return jiraIssues
+			return jiraIssues, err
 		}
 
 		body, readErr := ioutil.ReadAll(res.Body)
 		if readErr != nil {
-			log.Error(readErr)
-			return jiraIssues
+			return jiraIssues, err
 		}
 
 		jsonError := json.Unmarshal(body, &jiraIssues)
 		if jsonError != nil {
-			log.Error(jsonError)
+			return jiraIssues, err
 		}
 
 		AllIssues.Issues = append(AllIssues.Issues, jiraIssues.Issues...)
 
 	}
 
-	return AllIssues
+	return AllIssues, nil
 }
 
 type error interface {

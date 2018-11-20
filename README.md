@@ -14,7 +14,10 @@ Configuration is provided in the form of environment variables. If multiple Jira
 
 ### Optional
 
-* `JIRA_JQL` is the JIRA query language search filter (defaults to empty, so you'll get everything)
+* `JIRA_JQL` is the JIRA query language search filter (defaults to empty, so you'll get everything). If querying multiple Jira servers this variable is *not* optional. You must delimit null values if not specifying a filter for a server. For instance, if querying two servers:
+  * Filter for first, no filter for second: `JIRA_JQL="project=test,"`
+  * No filter for first, filter for second: `JIRA_JQL=",project=test"`
+  * No filter for either: `JIRA_JQL=","`
 * `METRICS_PATH` is the endpoint Prometheus should scrape on this exporter. Defaults to `/metrics`
 * `LISTEN_ADDRESS` is the IP and port to bind this exporter to. Defaults to `:9800`.
 
