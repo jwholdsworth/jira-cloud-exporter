@@ -2,6 +2,10 @@
 
 Exposes basic [JIRA](https://www.atlassian.com/software/jira) metrics (from one or more servers) to a [Prometheus](https://prometheus.io) compatible endpoint using the metric name: *jira_cloud_exporter*.
 
+## Building
+
+`make build`
+
 ## Configuration
 
 Configuration is provided in the form of environment variables. If multiple Jira servers are being queried, each variable value should be a comma separated list.
