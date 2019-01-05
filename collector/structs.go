@@ -2,34 +2,28 @@ package collector
 
 import "github.com/prometheus/client_golang/prometheus"
 
-type JiraMetrics struct {
-	jiraIssues *prometheus.Desc
+// Metrics tracks all the contextual metrics for this exporter
+type Metrics struct {
+	issue *prometheus.Desc
 }
 
-type JiraIssue struct {
-	Fields Fields `json:"fields"`
-	Key    string `json:"key"`
-}
-
-type Fields struct {
-	Assignee Assignee `json:"assignee"`
-	Project  Project  `json:"project"`
-	Status   Status   `json:"status"`
-	Created  string   `json:"created"`
-}
-
-type Assignee struct {
-	Name string `json:"name"`
-}
-
-type Status struct {
-	Name string `json:"name"`
-}
-
-type Project struct {
-	Name string `json:"name"`
-}
-
-type JiraIssues struct {
-	Issues []JiraIssue `json:"issues"`
+type jiraIssue struct {
+	Issues []struct {
+		Fields struct {
+			Assignee struct {
+				Name string `json:"name"`
+			} `json:"assignee"`
+			Created string `json:"created"`
+			Project struct {
+				Name string `json:"name"`
+			} `json:"project"`
+			Status struct {
+				Name string `json:"name"`
+			} `json:"status"`
+		} `json:"fields"`
+		Key string `json:"key"`
+	} `json:"issues"`
+	MaxResults int `json:"maxResults"`
+	StartAt    int `json:"startAt"`
+	Total      int `json:"total"`
 }
