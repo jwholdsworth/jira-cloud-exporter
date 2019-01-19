@@ -1,6 +1,6 @@
 # jira-cloud-exporter
 
-Exposes basic [JIRA](https://www.atlassian.com/software/jira) metrics (from one or more servers) to a [Prometheus](https://prometheus.io) compatible endpoint using the metric name: *jira_cloud_exporter*.
+Exposes basic [JIRA](https://www.atlassian.com/software/jira) metrics (from one or more servers) to a [Prometheus](https://prometheus.io) compatible endpoint using the metric name: *jira_cloud_issue*.
 
 ## Building
 
