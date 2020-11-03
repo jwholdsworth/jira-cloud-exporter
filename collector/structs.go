@@ -11,7 +11,7 @@ type jiraIssue struct {
 	Issues []struct {
 		Fields struct {
 			Assignee struct {
-				Name string `json:"name"`
+				Name string `json:"displayName"`
 			} `json:"assignee"`
 			Created string `json:"created"`
 			Project struct {
