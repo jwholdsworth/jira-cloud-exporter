@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jwholdsworth/jira-cloud-exporter/config"
+	"app/config"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 )
