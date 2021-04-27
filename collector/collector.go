@@ -19,7 +19,7 @@ func JiraCollector() *Metrics {
 	return &Metrics{
 		issue: prometheus.NewDesc(prometheus.BuildFQName("jira", "cloud", "issue"),
 			"Shows the number of issues matching the JQL",
-			[]string{"status", "project", "key", "assignee"}, nil,
+			[]string{"status", "project", "key", "assignee", "location", "priority"}, nil,
 		),
 	}
 }
@@ -40,7 +40,7 @@ func (collector *Metrics) Collect(ch chan<- prometheus.Metric) {
 
 	for _, issue := range collectedIssues.Issues {
 		createdTimestamp := convertToUnixTime(issue.Fields.Created)
-		ch <- prometheus.MustNewConstMetric(collector.issue, prometheus.CounterValue, createdTimestamp, issue.Fields.Status.Name, issue.Fields.Project.Name, issue.Key, issue.Fields.Assignee.Name)
+		ch <- prometheus.MustNewConstMetric(collector.issue, prometheus.CounterValue, createdTimestamp, issue.Fields.Status.Name, issue.Fields.Project.Name, issue.Key, issue.Fields.Assignee.Name, issue.Fields.Location.Name, issue.Fields.Priority.Name)
 	}
 }
 
